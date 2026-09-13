@@ -43,7 +43,7 @@ export default function Home() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/shop" className="btn-primary text-sm">Shop Now <ArrowRight size={16} /></Link>
-              <Link to="/shop?isNew=true" className="btn-outline text-sm">New Arrivals</Link>
+              <Link to="/new-arrivals" className="btn-outline text-sm">New Arrivals</Link>
             </div>
           </div>
         </div>

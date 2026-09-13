@@ -34,9 +34,12 @@ export default function App() {
       <Routes>
         {/* Public */}
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/"          element={<><Navbar/><Home/><Footer/></>} />
-        <Route path="/shop"      element={<><Navbar/><Shop/><Footer/></>} />
-        <Route path="/product/:id" element={<><Navbar/><ProductDetail/><Footer/></>} />
+        <Route path="/"              element={<><Navbar/><Home/><Footer/></>} />
+        <Route path="/shop"          element={<><Navbar/><Shop/><Footer/></>} />
+        <Route path="/collections"   element={<><Navbar/><Shop collectionType="featured"/><Footer/></>} />
+        <Route path="/new-arrivals"  element={<><Navbar/><Shop collectionType="new"/><Footer/></>} />
+        <Route path="/best-sellers"  element={<><Navbar/><Shop collectionType="bestsellers"/><Footer/></>} />
+        <Route path="/product/:id"   element={<><Navbar/><ProductDetail/><Footer/></>} />
         <Route path="/login"     element={<Login/>} />
         <Route path="/register"  element={<Register/>} />
         {/* Protected */}

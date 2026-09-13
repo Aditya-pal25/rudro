@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { SlidersHorizontal, X, Grid3X3, Grid2X2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../services/api';
@@ -17,8 +17,15 @@ const SORTS = [
   { value: 'rating', label: 'Top Rated' },
 ];
 
-export default function Shop() {
+export default function Shop({ collectionType }) {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const path = location.pathname;
+
+  const isCollections = collectionType === 'featured' || path === '/collections' || searchParams.get('isFeatured') === 'true';
+  const isNewArrivals = collectionType === 'new' || path === '/new-arrivals' || searchParams.get('isNew') === 'true';
+  const isBestSellers = collectionType === 'bestsellers' || path === '/best-sellers' || searchParams.get('isBestSeller') === 'true';
+
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [grid, setGrid] = useState(4);
   const [page, setPage] = useState(1);
@@ -29,21 +36,25 @@ export default function Shop() {
     size: '',
     fabric: '',
     gender: '',
-    sort: 'featured',
+    sort: isNewArrivals ? 'newest' : isBestSellers ? 'popular' : 'featured',
   });
 
-  // Sync URL params on mount
+  // Sync URL params on mount or route change
   useEffect(() => {
     const cat = searchParams.get('category');
     const keyword = searchParams.get('keyword');
     if (cat) setFilters(f => ({ ...f, category: cat }));
     if (keyword) setFilters(f => ({ ...f, keyword }));
-  }, []);
+    setPage(1);
+  }, [location.pathname, searchParams]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['products', filters, page],
+    queryKey: ['products', filters, page, path, collectionType],
     queryFn: () => {
       const params = new URLSearchParams();
+      if (isCollections) params.set('isFeatured', 'true');
+      if (isNewArrivals) params.set('isNew', 'true');
+      if (isBestSellers) params.set('isBestSeller', 'true');
       if (filters.category) params.set('category', filters.category);
       if (filters.minPrice) params.set('minPrice', filters.minPrice);
       if (filters.maxPrice) params.set('maxPrice', filters.maxPrice);
@@ -76,8 +87,12 @@ export default function Shop() {
       {/* Header */}
       <div className="border-b border-border bg-surface">
         <div className="max-w-7xl mx-auto px-4 py-8">
-          <span className="section-label">Explore</span>
-          <h1 className="font-display text-5xl text-cream">SHOP ALL</h1>
+          <span className="section-label">
+            {isCollections ? 'Signature Drops' : isNewArrivals ? 'Fresh In' : isBestSellers ? 'Customer Favorites' : 'Explore'}
+          </span>
+          <h1 className="font-display text-5xl text-cream">
+            {isCollections ? 'COLLECTIONS' : isNewArrivals ? 'NEW ARRIVALS' : isBestSellers ? 'BEST SELLERS' : (filters.category ? filters.category.toUpperCase() : 'SHOP ALL')}
+          </h1>
           <p className="text-muted text-sm mt-1">
             {isLoading ? 'Loading...' : `${data?.total || 0} Products`}
           </p>

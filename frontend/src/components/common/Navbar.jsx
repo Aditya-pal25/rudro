@@ -49,10 +49,10 @@ export default function Navbar() {
   }, [searchQuery]);
 
   const navLinks = [
-    { label: 'New Arrivals', to: '/shop?isNew=true' },
-    { label: 'Best Sellers', to: '/shop?isBestSeller=true' },
+    { label: 'New Arrivals', to: '/new-arrivals' },
+    { label: 'Best Sellers', to: '/best-sellers' },
     { label: 'Shop All',     to: '/shop' },
-    { label: 'Collections',  to: '/shop?isFeatured=true' },
+    { label: 'Collections',  to: '/collections' },
   ];
 
   return (
