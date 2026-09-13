@@ -1,0 +1,10 @@
+const router = require('express').Router();
+const { protect, admin } = require('../middleware/auth');
+const ctrl = require('../controllers/adminController');
+router.use(protect, admin);
+router.get('/dashboard', ctrl.getDashboardStats);
+router.get('/users', ctrl.getAllUsers);
+router.put('/users/:id/status', ctrl.toggleUserStatus);
+router.put('/users/:id/role', ctrl.changeUserRole);
+router.get('/analytics', ctrl.getAnalytics);
+module.exports = router;

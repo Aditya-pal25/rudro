@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #050505;
+    --surface: #0d0d0d;
+    --surface2: #161616;
+    --surface3: #1f1f1f;
+    --accent: #E8351A;
+    --gold: #FFB800;
+    --cream: #F2EDE4;
+    --muted: #555;
+    --border: #202020;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--cream); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  ::selection { background: var(--accent); color: white; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+}
+
+@layer components {
+  .font-display { font-family: 'Bebas Neue', cursive; }
+  .font-label { font-family: 'Barlow Condensed', sans-serif; }
+  
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-dark text-white font-label font-semibold text-sm tracking-widest uppercase px-7 py-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-accent/20 inline-flex items-center gap-2;
+  }
+  .btn-outline {
+    @apply border border-border hover:border-accent text-cream hover:text-accent font-label font-semibold text-sm tracking-widest uppercase px-7 py-3.5 transition-all duration-300 inline-flex items-center gap-2;
+  }
+  .btn-ghost {
+    @apply text-muted hover:text-cream font-label text-sm tracking-wider uppercase transition-colors duration-200 inline-flex items-center gap-2;
+  }
+  .input-field {
+    @apply w-full bg-surface2 border border-border text-cream placeholder-muted px-4 py-3 text-sm focus:outline-none focus:border-accent transition-colors duration-200;
+  }
+  .card {
+    @apply bg-surface border border-border;
+  }
+  .section-label {
+    @apply font-label text-accent text-xs tracking-[0.3em] uppercase mb-3 block;
+  }
+  .section-title {
+    @apply font-display text-5xl md:text-6xl leading-none text-cream;
+  }
+  .badge {
+    @apply font-label text-[11px] font-semibold tracking-[0.1em] uppercase px-2.5 py-1;
+  }
+  .glass {
+    @apply bg-surface/80 backdrop-blur-xl border border-border;
+  }
+  .link-nav {
+    @apply font-label text-[13px] font-semibold tracking-[0.12em] uppercase text-muted hover:text-cream transition-colors duration-200 cursor-pointer;
+  }
+  .grain-overlay::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+}
+
+/* Swiper customization */
+.swiper-pagination-bullet { background: var(--muted) !important; }
+.swiper-pagination-bullet-active { background: var(--accent) !important; }
+.swiper-button-next, .swiper-button-prev { color: var(--cream) !important; }
+
+/* Range slider */
+input[type="range"] { accent-color: var(--accent); }
+
+/* Animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Admin */
+.admin-label {
+  @apply text-xs font-label text-muted uppercase tracking-wider mb-1.5 block;
+}

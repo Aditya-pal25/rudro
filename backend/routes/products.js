@@ -1,0 +1,16 @@
+const router = require('express').Router();
+const { protect, admin } = require('../middleware/auth');
+const ctrl = require('../controllers/productController');
+router.get('/', ctrl.getProducts);
+router.get('/featured', ctrl.getFeatured);
+router.get('/best-sellers', ctrl.getBestSellers);
+router.get('/new-arrivals', ctrl.getNewArrivals);
+router.get('/search', ctrl.searchProducts);
+router.get('/admin/all', protect, admin, ctrl.getAllProductsAdmin);
+router.get('/:id', ctrl.getProduct);
+router.get('/:id/related', ctrl.getRelated);
+router.post('/', protect, admin, ctrl.createProduct);
+router.put('/:id', protect, admin, ctrl.updateProduct);
+router.delete('/:id', protect, admin, ctrl.deleteProduct);
+router.put('/:id/stock', protect, admin, ctrl.updateStock);
+module.exports = router;
