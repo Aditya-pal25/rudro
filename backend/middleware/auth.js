@@ -8,8 +8,8 @@ exports.protect = asyncHandler(async (req, res, next) => {
     token = req.headers.authorization.split(' ')[1];
   }
   if (!token) { res.status(401); throw new Error('Not authorized. Please log in.'); }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'rudroham_dev_jwt_secret_fallback_key_12345';
+    const decoded = jwt.verify(token, secret);
     const user = await User.findById(decoded.id).select('-password');
     if (!user) { res.status(401); throw new Error('User not found.'); }
     if (!user.isActive) { res.status(401); throw new Error('Account deactivated. Contact support.'); }

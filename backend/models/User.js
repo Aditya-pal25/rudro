@@ -60,7 +60,8 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
 };
 
 userSchema.methods.getJwtToken = function() {
-  return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
+  const secret = process.env.JWT_SECRET || 'rudroham_dev_jwt_secret_fallback_key_12345';
+  return jwt.sign({ id: this._id, role: this.role }, secret, { expiresIn: process.env.JWT_EXPIRE || '7d' });
 };
 
 userSchema.methods.getResetPasswordToken = function() {
