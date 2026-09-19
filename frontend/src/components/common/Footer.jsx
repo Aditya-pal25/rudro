@@ -25,11 +25,13 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="font-label text-xs font-semibold tracking-[0.2em] uppercase text-cream mb-5">Help</h4>
+          <h4 className="font-label text-xs font-semibold tracking-[0.2em] uppercase text-cream mb-5">Help & Policies</h4>
           <ul className="space-y-3">
-            {['Size Guide', 'Returns & Exchanges', 'Shipping Info', 'Track Order', 'FAQs', 'Contact Us'].map(item => (
-              <li key={item}><a href="#" className="text-sm text-muted hover:text-cream transition-colors">{item}</a></li>
-            ))}
+            <li><Link to="/shipping-policy" className="text-sm text-muted hover:text-cream transition-colors">Shipping & Delivery</Link></li>
+            <li><Link to="/refund-policy" className="text-sm text-muted hover:text-cream transition-colors">Returns & Refunds</Link></li>
+            <li><Link to="/privacy-policy" className="text-sm text-muted hover:text-cream transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="text-sm text-muted hover:text-cream transition-colors">Terms & Conditions</Link></li>
+            <li><Link to="/orders" className="text-sm text-muted hover:text-cream transition-colors">Track Order</Link></li>
           </ul>
         </div>
         <div>
@@ -50,11 +52,11 @@ export default function Footer() {
       </div>
       <div className="border-t border-border">
         <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-xs text-muted">© 2025 Rudroham. All rights reserved.</p>
+          <p className="text-xs text-muted">© 2026 Rudroham. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            {['Privacy Policy', 'Terms', 'Sitemap'].map(item => (
-              <a key={item} href="#" className="text-xs text-muted hover:text-cream transition-colors">{item}</a>
-            ))}
+            <Link to="/privacy-policy" className="text-xs text-muted hover:text-cream transition-colors">Privacy Policy</Link>
+            <Link to="/terms" className="text-xs text-muted hover:text-cream transition-colors">Terms & Conditions</Link>
+            <Link to="/refund-policy" className="text-xs text-muted hover:text-cream transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>

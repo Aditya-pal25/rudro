@@ -19,6 +19,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import ResetPassword from './pages/ResetPassword';
+import Policy from './pages/Policy';
 
 export default function App() {
   const { loadUser } = useAuthStore();
@@ -40,6 +41,11 @@ export default function App() {
         <Route path="/new-arrivals"  element={<><Navbar/><Shop collectionType="new"/><Footer/></>} />
         <Route path="/best-sellers"  element={<><Navbar/><Shop collectionType="bestsellers"/><Footer/></>} />
         <Route path="/product/:id"   element={<><Navbar/><ProductDetail/><Footer/></>} />
+        <Route path="/privacy-policy" element={<><Navbar/><Policy initialTab="privacy"/><Footer/></>} />
+        <Route path="/terms"          element={<><Navbar/><Policy initialTab="terms"/><Footer/></>} />
+        <Route path="/shipping-policy" element={<><Navbar/><Policy initialTab="shipping"/><Footer/></>} />
+        <Route path="/refund-policy"  element={<><Navbar/><Policy initialTab="refund"/><Footer/></>} />
+        <Route path="/policies"       element={<><Navbar/><Policy /><Footer/></>} />
         <Route path="/login"     element={<Login/>} />
         <Route path="/register"  element={<Register/>} />
         {/* Protected */}
