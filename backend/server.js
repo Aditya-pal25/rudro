@@ -21,10 +21,11 @@ app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' }, xXssProtection: true }));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
+// Normalize origins by stripping trailing slashes
 const allowedOrigins = [
   ...(process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:5173').split(','),
   ...(process.env.ADMIN_CLIENT_URLS || 'http://localhost:5174').split(','),
-].map(s => s.trim()).filter(Boolean);
+].map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
 
 app.use(cors({
   origin: (origin, cb) => {
@@ -58,7 +59,8 @@ app.get('/health', (req, res) => res.status(200).json({ status: 'OK', service: '
 app.get('/api/health', (req, res) => res.status(200).json({ status: 'OK', service: 'Rudroham Public API', ts: new Date().toISOString() }));
 
 // ── Rate limiters ─────────────────────────────────────────────────────────────
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 150, standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Too many requests. Please try again later.' } }));
+// Allow 600 requests / 15m for browsing (prevents false blocks under traffic)
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 600, standardHeaders: true, legacyHeaders: false, message: { success: false, message: 'Too many requests. Please try again later.' } }));
 app.use('/api/auth/login',      rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { success: false, message: 'Too many login attempts.' } }));
 app.use('/api/auth/register',   rateLimit({ windowMs: 15 * 60 * 1000, max: 5,  message: { success: false, message: 'Too many registration attempts.' } }));
 app.use('/api/auth/forgot',     rateLimit({ windowMs: 60 * 60 * 1000, max: 5,  message: { success: false, message: 'Too many password reset requests.' } }));
@@ -75,6 +77,10 @@ app.use('/api/reviews',  require('./routes/reviews'));
 app.use('/api/coupons',  require('./routes/coupons'));
 app.use('/api/payment',  require('./routes/payment'));
 app.use('/api/upload',   require('./routes/upload'));
+// Mounted public banners, settings, returns
+app.use('/api/banners',  require('./routes/banners'));
+app.use('/api/settings', require('./routes/settings'));
+app.use('/api/returns',  require('./routes/returns'));
 
 // ── ADMIN routes (Secured by JWT + admin role for single-instance hosting) ─────
 const { protect, admin } = require('./middleware/auth');
@@ -88,6 +94,10 @@ app.use('/admin-api/upload',   protect, admin, require('./routes/upload'));
 app.use('/admin-api/coupons',  protect, admin, require('./routes/coupons'));
 app.use('/admin-api/reviews',  protect, admin, require('./routes/reviews'));
 app.use('/admin-api/users',    protect, admin, require('./routes/users'));
+// Mounted admin banners, settings, returns
+app.use('/admin-api/banners',  protect, admin, require('./routes/banners'));
+app.use('/admin-api/settings', protect, admin, require('./routes/settings'));
+app.use('/admin-api/returns',  protect, admin, require('./routes/returns'));
 app.get('/admin-api/health', protect, admin, (req, res) => res.json({ status: 'OK', service: 'Rudroham Admin API', ts: new Date().toISOString() }));
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
