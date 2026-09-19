@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingBag, Users, Tag, BarChart3, LogOut, Menu, X, ChevronRight, Shield } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Users, Tag, BarChart3, LogOut, Menu, X, ChevronRight, Shield, Image, RotateCcw, Settings } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
@@ -8,9 +8,12 @@ const navItems = [
   { to: '/',          label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { to: '/products',  label: 'Products',  icon: Package },
   { to: '/orders',    label: 'Orders',    icon: ShoppingBag },
+  { to: '/returns',   label: 'Returns & Cancellations', icon: RotateCcw },
+  { to: '/banners',   label: 'Banners',   icon: Image },
   { to: '/customers', label: 'Customers', icon: Users },
   { to: '/coupons',   label: 'Coupons',   icon: Tag },
   { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { to: '/settings',  label: 'Settings',  icon: Settings },
 ];
 
 export default function AdminLayout() {
