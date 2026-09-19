@@ -118,6 +118,33 @@ export default function Checkout() {
       setLoading(false); // Stop spinner — Razorpay modal takes over
 
       // Step 3: Open Razorpay checkout
+      // Dev simulation fallback (if Razorpay keys are not yet configured in .env)
+      if (rpData.isMock) {
+        setLoading(false);
+        const simulateSuccess = window.confirm(
+          `🧪 [DEV TEST MODE]\n\nRazorpay keys are not yet set in backend/.env.\n\nClick OK to simulate successful payment for ₹${total}.\nClick Cancel to simulate a failed payment.`
+        );
+        if (simulateSuccess) {
+          await api.post('/payment/razorpay/verify', {
+            orderId: order._id,
+            razorpay_order_id: rpData.order.id,
+            razorpay_payment_id: `pay_mock_${Date.now()}`,
+            razorpay_signature: 'simulated_dev_signature',
+          });
+          clearCart();
+          toast.success('Payment successful! 🎉');
+          navigate(`/order-success/${order._id}`);
+        } else {
+          await api.post('/payment/razorpay/failed', {
+            orderId: order._id,
+            reason: 'Simulated payment cancellation',
+          });
+          toast.error('Payment cancelled. View order in My Orders.');
+          navigate('/orders');
+        }
+        return;
+      }
+
       const options = {
         key: rpData.key,
         amount: rpData.order.amount,
@@ -126,19 +153,14 @@ export default function Checkout() {
         description: 'Premium T-Shirts',
         image: '/favicon.svg',
         order_id: rpData.order.id,
-        // ✅ Success handler
+        // ✅ Success handler: verify signature on backend & atomically confirm order
         handler: async function (response) {
           try {
-            // Verify payment signature on backend
             await api.post('/payment/razorpay/verify', {
+              orderId: order._id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
-            });
-            // Update order status to confirmed + paid
-            await api.put(`/orders/${order._id}/status`, {
-              status: 'confirmed',
-              note: `Payment successful. Razorpay ID: ${response.razorpay_payment_id}`,
             });
             clearCart();
             toast.success('Payment successful! 🎉');
@@ -158,10 +180,15 @@ export default function Checkout() {
         },
         theme: { color: '#E8351A' },
         modal: {
-          // ✅ Handle modal dismiss / payment failure
+          // ✅ Handle modal dismiss / cancellation
           ondismiss: async function () {
+            try {
+              await api.post('/payment/razorpay/failed', {
+                orderId: order._id,
+                reason: 'Payment modal dismissed by user',
+              });
+            } catch {}
             toast.error('Payment cancelled. Your order has been saved — complete payment from My Orders.');
-            // Don't clear cart, navigate to orders so user can see pending order
             navigate('/orders');
           },
         },
@@ -171,12 +198,11 @@ export default function Checkout() {
 
       // Handle payment failure
       rzp.on('payment.failed', async function (response) {
-        toast.error(`Payment failed: ${response.error.description}`);
-        // Mark order payment as failed
+        toast.error(`Payment failed: ${response.error?.description || 'Transaction declined'}`);
         try {
-          await api.put(`/orders/${order._id}/status`, {
-            status: 'placed',
-            note: `Payment failed: ${response.error.description}`,
+          await api.post('/payment/razorpay/failed', {
+            orderId: order._id,
+            reason: response.error?.description || 'Transaction declined',
           });
         } catch {}
         navigate('/orders');
