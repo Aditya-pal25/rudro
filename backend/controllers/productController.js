@@ -109,7 +109,8 @@ exports.getBestSellers = asyncHandler(async (req, res) => {
 });
 
 exports.getNewArrivals = asyncHandler(async (req, res) => {
-  const products = await Product.find({ isNew: true, isActive: true })
+  // Query active products flagged as new arrival
+  const products = await Product.find({ isNewArrival: true, isActive: true })
     .sort({ createdAt: -1 }).limit(8);
   res.json({ success: true, products });
 });

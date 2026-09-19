@@ -75,6 +75,10 @@ productSchema.pre('save', function(next) {
 // ✅ FIX: No duplicate slug index — it's already declared via unique:true above
 productSchema.index({ name: 1, category: 1 });
 productSchema.index({ price: 1, ratings: -1, createdAt: -1 });
-productSchema.index({ isActive: 1, isFeatured: -1 });
+// Compound indexes for high-traffic homepage & shop filters
+productSchema.index({ isActive: 1, isFeatured: -1, createdAt: -1 });
+productSchema.index({ isActive: 1, isNewArrival: -1, createdAt: -1 });
+productSchema.index({ isActive: 1, isBestSeller: -1, totalSold: -1 });
+productSchema.index({ isActive: 1, category: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Product', productSchema);

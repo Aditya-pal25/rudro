@@ -31,7 +31,8 @@ const otpSchema = new mongoose.Schema(
 
     type: {
       type: String,
-      enum: ['register', 'login', 'forgot-password'],
+      // Includes admin-login for separate 2FA flow
+      enum: ['register', 'login', 'forgot-password', 'admin-login'],
       required: true
     },
 
