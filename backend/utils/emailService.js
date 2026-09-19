@@ -8,7 +8,17 @@ const getTransporter = () => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
 
-  if (!emailUser || !emailPass) {
+  const isPlaceholder = emailUser === 'your-email@gmail.com' || emailPass === 'your_gmail_app_password';
+  if (!emailUser || !emailPass || isPlaceholder) {
+    if (process.env.NODE_ENV !== 'production') {
+      // Dev mode fallback: log OTP to terminal console instead of crashing
+      return {
+        sendMail: async (opts) => {
+          console.log(`\n========================================\n📧 [DEV EMAIL OTP] To: ${opts.to}\nSubject: ${opts.subject}\nText: ${opts.text}\n========================================\n`);
+          return true;
+        },
+      };
+    }
     throw new Error('EMAIL_USER or EMAIL_PASS is missing from .env');
   }
 
