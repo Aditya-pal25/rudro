@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Search, ChevronDown, ChevronUp } from 'lucide-react';
 import api from '../../services/api';
@@ -9,9 +10,21 @@ const STATUS_COLOR = { placed:'text-blue-400', confirmed:'text-blue-400', proces
 
 export default function AdminOrders() {
   const qc = useQueryClient();
-  const [statusFilter, setStatusFilter] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [expanded, setExpanded] = useState(null);
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const s = searchParams.get('status');
+    if (s !== null) setStatusFilter(s);
+  }, [searchParams]);
+
+  const handleFilterChange = (s) => {
+    setStatusFilter(s);
+    setPage(1);
+    setSearchParams(s ? { status: s } : {});
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-orders', statusFilter, page],
@@ -35,7 +48,7 @@ export default function AdminOrders() {
 
       <div className="flex gap-3 flex-wrap">
         {['', ...STATUSES].map(s => (
-          <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }}
+          <button key={s} onClick={() => handleFilterChange(s)}
             className={`font-label text-xs font-semibold tracking-wider uppercase px-3 py-1.5 border transition-colors ${statusFilter === s ? 'bg-accent border-accent text-white' : 'border-border text-muted hover:text-cream'}`}>
             {s || 'All'}
           </button>

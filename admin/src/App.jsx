@@ -9,6 +9,9 @@ import AdminOrders from './pages/admin/AdminOrders';
 import AdminCustomers from './pages/admin/AdminCustomers';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminReturns from './pages/admin/AdminReturns';
+import AdminBanners from './pages/admin/AdminBanners';
+import AdminSettings from './pages/admin/AdminSettings';
 import ScrollToTop from './components/common/ScrollToTop';
 
 function AdminRoute({ children }) {
@@ -29,9 +32,12 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="products"  element={<AdminProducts />} />
           <Route path="orders"    element={<AdminOrders />} />
+          <Route path="returns"   element={<AdminReturns />} />
+          <Route path="banners"   element={<AdminBanners />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="coupons"   element={<AdminCoupons />} />
           <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="settings"  element={<AdminSettings />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
