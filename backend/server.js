@@ -21,22 +21,32 @@ app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' }, xXssProtection: true }));
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
-// Normalize origins by stripping trailing slashes
 const allowedOrigins = [
+  'https://rudroham.in',
+  'https://www.rudroham.in',
+  'https://admin.rudroham.in',
   ...(process.env.CLIENT_URLS || process.env.CLIENT_URL || 'http://localhost:5173').split(','),
   ...(process.env.ADMIN_CLIENT_URLS || 'http://localhost:5174').split(','),
 ].map(s => s.trim().replace(/\/$/, '')).filter(Boolean);
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    // Auto-allow rudroham.in and any subdomain (e.g. www, admin)
+    if (/^https?:\/\/([a-zA-Z0-9-]+\.)*rudroham\.in$/.test(origin)) return cb(null, true);
+    // Auto-allow all Vercel deployment URLs
+    if (/^https?:\/\/.*\.vercel\.app$/.test(origin)) return cb(null, true);
+    // Allow localhost in development
     if (process.env.NODE_ENV !== 'production' && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
       return cb(null, true);
     }
+    console.warn(`🚨 [CORS Blocked] Origin: ${origin}`);
     cb(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
 // ── Body limits (2mb max — not 10mb) ─────────────────────────────────────────
