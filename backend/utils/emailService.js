@@ -31,6 +31,12 @@ const getTransporter = () => {
       user: emailUser,
       pass: emailPass,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 8000,
+    greetingTimeout: 5000,
+    socketTimeout: 10000,
   });
 
   return transporter;
@@ -124,8 +130,6 @@ const emailTemplate = (content) => `
 `;
 
 const sendOTPEmail = async (email, otp, type, name = '') => {
-  const tp = getTransporter();
-
   let subject;
   let bodyContent;
 
@@ -337,18 +341,74 @@ const sendOTPEmail = async (email, otp, type, name = '') => {
   // SEND EMAIL
   // ============================================================
 
-  await tp.sendMail({
-    from: `"RUDROHAM" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject,
-    html: emailTemplate(bodyContent),
+  const html = emailTemplate(bodyContent);
+  const text =
+    type === 'reset'
+      ? `Your Rudroham password reset OTP is: ${otp}. This OTP expires in 10 minutes. Never share this OTP with anyone.`
+      : `Your Rudroham OTP is: ${otp}. This OTP expires in 10 minutes. Never share this OTP with anyone.`;
 
-    // Plain-text fallback
-    text:
-      type === 'reset'
-        ? `Your Rudroham password reset OTP is: ${otp}. This OTP expires in 10 minutes. Never share this OTP with anyone.`
-        : `Your Rudroham OTP is: ${otp}. This OTP expires in 10 minutes. Never share this OTP with anyone.`,
-  });
+  // 1. Resend HTTP API (Port 443 — works seamlessly on Render Free Tier)
+  if (process.env.RESEND_API_KEY) {
+    const from = process.env.EMAIL_FROM || 'RUDROHAM <onboarding@resend.dev>';
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ from, to: [email], subject, html, text }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('❌ Resend API Error:', data);
+      throw new Error(data.message || 'Failed to send email via Resend');
+    }
+    return data;
+  }
+
+  // 2. Brevo HTTP API (Port 443 — works seamlessly on Render Free Tier)
+  if (process.env.BREVO_API_KEY) {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': process.env.BREVO_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: {
+          name: process.env.EMAIL_FROM_NAME || 'RUDROHAM',
+          email: process.env.EMAIL_USER || 'rudroham.in@gmail.com',
+        },
+        to: [{ email, name: name || email }],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      console.error('❌ Brevo API Error:', data);
+      throw new Error(data.message || 'Failed to send email via Brevo');
+    }
+    return data;
+  }
+
+  // 3. SMTP Fallback (Nodemailer — for local dev or paid instances)
+  const tp = getTransporter();
+  try {
+    return await tp.sendMail({
+      from: `"RUDROHAM" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject,
+      html,
+      text,
+    });
+  } catch (err) {
+    if (err.code === 'ETIMEDOUT' || err.code === 'ECONNECTION' || err.code === 'ESOCKET') {
+      console.error('❌ SMTP Connection Timed Out. Render Free Tier blocks outbound SMTP ports 25, 465, and 587. Configure RESEND_API_KEY or BREVO_API_KEY on Render to send over HTTPS port 443.');
+    }
+    throw err;
+  }
 };
 
 module.exports = {
