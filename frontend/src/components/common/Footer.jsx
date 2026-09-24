@@ -37,9 +37,9 @@ export default function Footer() {
         <div>
           <h4 className="font-label text-xs font-semibold tracking-[0.2em] uppercase text-cream mb-5">Contact</h4>
           <ul className="space-y-4">
-            <li className="flex items-start gap-3 text-sm text-muted"><MapPin size={15} className="mt-0.5 flex-shrink-0 text-accent" />Rudroham HQ, Bhopal, Madhya Pradesh, India</li>
-            <li className="flex items-center gap-3 text-sm text-muted"><Phone size={15} className="text-accent" />+91 98765 43210</li>
-            <li className="flex items-center gap-3 text-sm text-muted"><Mail size={15} className="text-accent" />hello@rudroham.com</li>
+            <li className="flex items-start gap-3 text-sm text-muted"><MapPin size={15} className="mt-0.5 flex-shrink-0 text-accent" />Rudroham, Gwalior, Madhya Pradesh, India</li>
+            <li className="flex items-center gap-3 text-sm text-muted"><Phone size={15} className="text-accent" />+91 8770483654</li>
+            <li className="flex items-center gap-3 text-sm text-muted"><Mail size={15} className="text-accent" />rudroham.in@gmail.com</li>
           </ul>
           <div className="mt-6">
             <p className="text-xs text-muted mb-3 font-label tracking-wider uppercase">Newsletter</p>
