@@ -348,12 +348,13 @@ const sendOTPEmail = async (email, otp, type, name = '') => {
       : `Your Rudroham OTP is: ${otp}. This OTP expires in 10 minutes. Never share this OTP with anyone.`;
 
   // 1. Resend HTTP API (Port 443 — works seamlessly on Render Free Tier)
-  if (process.env.RESEND_API_KEY) {
+  const resendKey = process.env.RESEND_API_KEY?.trim()?.replace(/^["']|["']$/g, '');
+  if (resendKey) {
     const from = process.env.EMAIL_FROM || 'RUDROHAM <onboarding@resend.dev>';
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Authorization': `Bearer ${resendKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ from, to: [email], subject, html, text }),
@@ -367,12 +368,14 @@ const sendOTPEmail = async (email, otp, type, name = '') => {
   }
 
   // 2. Brevo HTTP API (Port 443 — works seamlessly on Render Free Tier)
-  if (process.env.BREVO_API_KEY) {
+  const brevoKey = process.env.BREVO_API_KEY?.trim()?.replace(/^["']|["']$/g, '');
+  if (brevoKey) {
     const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
       headers: {
-        'api-key': process.env.BREVO_API_KEY,
+        'api-key': brevoKey,
         'Content-Type': 'application/json',
+        'accept': 'application/json',
       },
       body: JSON.stringify({
         sender: {

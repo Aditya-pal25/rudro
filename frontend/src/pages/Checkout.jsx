@@ -23,7 +23,7 @@ export default function Checkout() {
 
   const subtotal = getSubtotal();
   const shipping = subtotal >= 599 ? 0 : 79;
-  const tax = Math.round((subtotal - couponDiscount) * 0.18);
+  const tax = 0; // Disabled: Math.round((subtotal - couponDiscount) * 0.18);
   const total = subtotal - couponDiscount + shipping + tax;
 
   const { register, handleSubmit, formState: { errors } } = useForm({

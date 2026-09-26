@@ -69,7 +69,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
   // ── Calculate totals ──────────────────────────────────────────────────────
   const shippingCharge = subtotal >= 599 ? 0 : 79;
   const taxableAmount = subtotal - couponDiscount;
-  const tax = Math.round(taxableAmount * 0.18);
+  const tax = 0; // Disabled: Math.round(taxableAmount * 0.18);
   const total = taxableAmount + shippingCharge + tax;
 
   // ── Create order ──────────────────────────────────────────────────────────
