@@ -9,7 +9,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'JsonWebTokenError') { statusCode = 401; message = 'Invalid token. Please log in again.'; }
   if (err.name === 'TokenExpiredError') { statusCode = 401; message = 'Session expired. Please log in again.'; }
 
-  if (statusCode >= 500 && !isProd) console.error(err.stack);
+  if (statusCode >= 500) console.error('[Backend Error]:', err.stack || err);
 
   res.status(statusCode).json({
     success: false,
